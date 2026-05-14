@@ -4,7 +4,9 @@
     <remote
         name="theangelplace"
         fetch="https://github.com/The-Angel-Place-Sapphire" />
-
+    <remote
+        name="swiitch-labs"
+        fetch="https://github.com/swiitch-off-lab" />
     <!-- Device Trees -->
 
     <project
@@ -36,6 +38,12 @@
         name="android_hardware_xiaomi"
         remote="theangelplace"
         revision="lineage-23.2" />
+    
+    <project
+        path="hardware/dolby"
+        name="hardware_dolby"
+        remote="swiitch-labs"
+        revision="sony-1.4" />
 
     <!-- HALs -->
 
