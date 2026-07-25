@@ -1,0 +1,123 @@
+diff --git a/Android.bp b/Android.bp
+index 0517b15..dc92edf 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -28,6 +28,18 @@ java_import {
+ android_app {
+     name: "StatixLauncher",
+ 
++    // AOSP 16 Launcher3 references the Compose facade
++    // (WidgetPickerComposeWrapper, LauncherWidgetPickerModule) from
++    // :launcher-src / :launcher-quickstep-src.  Those symbols come from the
++    // compose defaults, which supply either the enabled or the disabled facade
++    // sources depending on release_enable_compose_in_launcher -- so they are
++    // required even when Compose is off.  Launcher3QuickStepLib applies the
++    // same two defaults; without them dagger fails to resolve the modules.
++    defaults: [
++        "launcher_compose_defaults",
++        "quickstep_compose_defaults",
++    ],
++
+     resource_dirs: [
+         "res",
+     ],
+diff --git a/res/layout/launcher.xml b/res/layout/launcher.xml
+index df23bc4..c121597 100644
+--- a/res/layout/launcher.xml
++++ b/res/layout/launcher.xml
+@@ -52,12 +52,46 @@
+ 
+         <!-- Keep these behind the workspace so that they are not visible when
+          we go into AllApps -->
+-        <com.android.launcher3.pageindicators.PageIndicatorDots
+-            android:id="@+id/page_indicator"
++        <!-- AOSP 16 moved the page indicator into a container alongside two
++             PaginationArrow views.  Launcher.setupViews() resolves
++             left/right_indicator_arrow unconditionally and calls
++             setOnClickListener on them, so leaving them out of this overridden
++             layout makes StatixLauncher NPE on every start. -->
++        <LinearLayout
++            android:id="@+id/page_indicator_container"
+             android:layout_width="match_parent"
+             android:layout_height="@dimen/workspace_page_indicator_height"
+             android:layout_gravity="bottom|center_horizontal"
+-            android:theme="@style/HomeScreenElementTheme" />
++            android:gravity="center"
++            android:orientation="horizontal">
++
++            <com.android.launcher3.pageindicators.PaginationArrow
++                android:id="@+id/left_indicator_arrow"
++                android:layout_width="@dimen/folder_arrow_touchbox_length"
++                android:layout_height="@dimen/folder_arrow_touchbox_length"
++                android:contentDescription="@string/paginate_left"
++                android:elevation="1dp"
++                android:foreground="@drawable/ic_chevron_left_rounded_700"
++                android:foregroundGravity="center"
++                android:visibility="gone" />
++
++            <com.android.launcher3.pageindicators.PageIndicatorDots
++                android:id="@+id/page_indicator"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:theme="@style/HomeScreenElementTheme" />
++
++            <com.android.launcher3.pageindicators.PaginationArrow
++                android:id="@+id/right_indicator_arrow"
++                android:layout_width="@dimen/folder_arrow_touchbox_length"
++                android:layout_height="@dimen/folder_arrow_touchbox_length"
++                android:contentDescription="@string/paginate_right"
++                android:elevation="1dp"
++                android:foreground="@drawable/ic_chevron_left_rounded_700"
++                android:foregroundGravity="center"
++                android:rotation="180"
++                android:visibility="gone" />
++        </LinearLayout>
+ 
+         <include
+             android:id="@+id/drop_target_bar"
+diff --git a/src/com/statix/launcher/ThemedLocalColorExtractor.java b/src/com/statix/launcher/ThemedLocalColorExtractor.java
+index 9dcdd80..ac7b3d9 100644
+--- a/src/com/statix/launcher/ThemedLocalColorExtractor.java
++++ b/src/com/statix/launcher/ThemedLocalColorExtractor.java
+@@ -18,6 +18,7 @@ package com.statix.launcher;
+ 
+ import android.app.WallpaperColors;
+ import android.content.Context;
++import android.content.theming.ThemeStyle;
+ import android.content.res.Configuration;
+ import android.provider.Settings;
+ import android.util.SparseIntArray;
+@@ -29,7 +30,6 @@ import com.android.launcher3.Launcher;
+ import com.android.launcher3.views.ActivityContext;
+ import com.android.launcher3.widget.LocalColorExtractor;
+ import com.android.systemui.monet.ColorScheme;
+-import com.android.systemui.monet.Style;
+ 
+ import org.json.JSONException;
+ import org.json.JSONObject;
+@@ -154,7 +154,7 @@ public class ThemedLocalColorExtractor extends LocalColorExtractor {
+                 (mContext.getResources().getConfiguration().uiMode
+                                 & Configuration.UI_MODE_NIGHT_MASK)
+                         == Configuration.UI_MODE_NIGHT_YES;
+-        ColorScheme colorScheme = new ColorScheme(colors, darkMode, Style.VIBRANT);
++        ColorScheme colorScheme = new ColorScheme(colors, darkMode, ThemeStyle.VIBRANT);
+         addColorsToArray(colorScheme.getAccent1().allShades, ACCENT1_RES, colorRes);
+         addColorsToArray(colorScheme.getAccent2().allShades, ACCENT2_RES, colorRes);
+         addColorsToArray(colorScheme.getAccent3().allShades, ACCENT3_RES, colorRes);
+diff --git a/src/com/statix/launcher/hpapps/HpAppsActivity.java b/src/com/statix/launcher/hpapps/HpAppsActivity.java
+index 74677c1..b186e62 100644
+--- a/src/com/statix/launcher/hpapps/HpAppsActivity.java
++++ b/src/com/statix/launcher/hpapps/HpAppsActivity.java
+@@ -121,9 +121,9 @@ public class HpAppsActivity extends Activity
+ 
+     @Override
+     public void onUpdated(boolean result) {
+-        LauncherAppState.INSTANCE.executeIfCreated(state -> {
+-            state.getModel().forceReload();
+-        });
++        // AOSP 16 turned LauncherAppState.INSTANCE into a DaggerSingletonObject,
++        // which drops executeIfCreated(); getInstance() is the supported accessor.
++        LauncherAppState.getInstance(this).getModel().forceReload();
+     }
+ 
+     @Override

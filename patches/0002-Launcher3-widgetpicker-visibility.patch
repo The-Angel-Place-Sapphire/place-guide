@@ -1,0 +1,14 @@
+diff --git a/modules/widgetpicker/Android.bp b/modules/widgetpicker/Android.bp
+index 4d31d1c5a0..429458a3f5 100644
+--- a/modules/widgetpicker/Android.bp
++++ b/modules/widgetpicker/Android.bp
+@@ -17,6 +17,9 @@ package {
+     default_applicable_licenses: ["Android-Apache-2.0"],
+     default_visibility: [
+         "//packages/apps/Launcher3:__subpackages__",
++        // StatixLauncher replaces Launcher3QuickStep and applies the same
++        // launcher_compose_defaults, so it needs widget_picker_component too.
++        "//packages/apps/Statix/Launcher:__subpackages__",
+         "//vendor:__subpackages__",
+     ],
+ }
