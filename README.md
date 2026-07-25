@@ -13,6 +13,15 @@ Choose the method that fits your workflow.
 
 ---
 
+# 🌐 Place-bringups
+
+| ROM | Branch |
+| :-- | :-- |
+| 🟩 **LineageOS / AOSP** | [`main`](https://github.com/The-Angel-Place-Sapphire/place-guide/tree/main) |
+| 🟦 **StatiX (bp4a)** | [`statix-bp4a`](https://github.com/The-Angel-Place-Sapphire/place-guide/tree/statix-bp4a) |
+
+---
+
 # 📦 Main Repositories
 
 ## 🌳 Device Tree
