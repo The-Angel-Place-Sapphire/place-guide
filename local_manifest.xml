@@ -5,37 +5,59 @@
         name="theangelplace"
         fetch="https://github.com/The-Angel-Place-Sapphire" />
 
+    <remote
+        name="los"
+        fetch="https://github.com/LineageOS" />
+
     <!-- Device Trees -->
 
     <project
         path="device/xiaomi/sapphire-kernel"
         name="device_xiaomi_sapphire-kernel"
         remote="theangelplace"
-        revision="lineage-23.2" />
+        revision="aospa-beryl" />
 
     <project
         path="device/xiaomi/sepolicy"
         name="device_xiaomi_sepolicy"
         remote="theangelplace"
-        revision="16" />
+        revision="aospa-beryl" />
 
     <project
         path="device/xiaomi/sapphire"
         name="device_xiaomi_sapphire"
         remote="theangelplace"
-        revision="lineage-23.2" />
+        revision="aospa-beryl" />
 
     <project
         path="vendor/xiaomi/sapphire"
         name="vendor_xiaomi_sapphire"
         remote="theangelplace"
-        revision="lineage-23.2" />
+        revision="aospa-beryl" />
+
+    <project
+        path="device/xiaomi/miuicamera-sapphire"
+        name="device_xiaomi_miuicamera-sapphire"
+        remote="theangelplace"
+        revision="aospa-beryl" />
+
+    <project
+        path="vendor/xiaomi/miuicamera-sapphire"
+        name="vendor_xiaomi_miuicamera-sapphire"
+        remote="theangelplace"
+        revision="aospa-beryl" />
 
     <project
         path="hardware/xiaomi"
         name="android_hardware_xiaomi"
         remote="theangelplace"
-        revision="lineage-23.2" />
+        revision="aospa-beryl" />
+
+    <project
+        path="hardware/dolby"
+        name="hardware_dolby"
+        remote="theangelplace"
+        revision="aospa-beryl" />
 
     <!-- HALs -->
 
@@ -43,54 +65,71 @@
         path="hardware/qcom-caf/common"
         name="android_hardware_qcom-caf_common"
         remote="theangelplace"
-        revision="lineage-23.2" />
+        revision="aospa-beryl" />
 
     <project
         path="hardware/qcom-caf/sm6225/audio/agm"
         name="vendor_qcom_opensource_agm"
         remote="theangelplace"
-        revision="lineage-22.2-caf-sm6225" />
+        revision="aospa-beryl" />
 
     <project
         path="hardware/qcom-caf/sm6225/audio/pal"
         name="vendor_qcom_opensource_arpal-lx"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="aospa-beryl" />
 
     <project
         path="hardware/qcom-caf/sm6225/data-ipa-cfg-mgr"
         name="vendor_qcom_opensource_data-ipa-cfg-mgr"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="aospa-beryl" />
 
     <project
         path="hardware/qcom-caf/sm6225/dataipa"
         name="vendor_qcom_opensource_dataipa"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="aospa-beryl" />
 
     <project
         path="hardware/qcom-caf/sm6225/display"
         name="hardware_qcom_display"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="aospa-beryl" />
 
     <project
         path="hardware/qcom-caf/sm6225/media"
         name="hardware_qcom_media"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="aospa-beryl" />
 
     <project
         path="hardware/qcom-caf/sm6225/audio/primary-hal"
         name="hardware_qcom_audio"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="aospa-beryl" />
 
     <project
         path="device/qcom/sepolicy_vndr/sm6225"
         name="device_qcom_sepolicy_vndr"
         remote="theangelplace"
-        revision="lineage-23.0-caf-sm6225" />
+        revision="aospa-beryl" />
+
+    <!--
+         Upstream LineageOS projects AOSPA does not ship.
+
+         EuiccPolicy provides the EuiccPolicy module that XiaomiEuicc requires.
+
+         hardware/lineage/interfaces is NOT listed here on purpose: the repo also
+         carries a health interface that collides with AOSPA's own
+         vendor.lineage.health. Copy only its touch/ subdirectory by hand, as
+         described in the guide.
+    -->
+
+    <project
+        path="packages/apps/EuiccPolicy"
+        name="android_packages_apps_EuiccPolicy"
+        remote="los"
+        revision="lineage-23.2" />
 
 </manifest>
