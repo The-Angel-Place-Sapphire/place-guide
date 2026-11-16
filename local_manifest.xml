@@ -6,13 +6,26 @@
         name="theangelplace"
         fetch="https://github.com/The-Angel-Place-Sapphire" />
 
-    <!-- Device Trees -->
-
+    <!-- Kernel (built from source) -->
     <project
-        path="device/xiaomi/sapphire-kernel"
-        name="device_xiaomi_sapphire-kernel"
+        path="kernel/xiaomi/sapphire"
+        name="kernel_xiaomi_sapphire"
         remote="theangelplace"
         revision="lineage-23.2" />
+
+    <project
+        path="kernel/xiaomi/sapphire-devicetrees"
+        name="kernel_xiaomi_sapphire-devicetrees"
+        remote="theangelplace"
+        revision="lineage-23.2" />
+
+    <project
+        path="kernel/xiaomi/sapphire-modules"
+        name="kernel_xiaomi_sapphire-modules"
+        remote="theangelplace"
+        revision="lineage-23.2" />
+
+    <!-- Device Trees -->
 
     <project
         path="device/xiaomi/sepolicy"
