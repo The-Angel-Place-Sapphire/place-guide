@@ -30,11 +30,16 @@ Choose the method that fits your workflow.
 https://github.com/The-Angel-Place-Sapphire/device_xiaomi_sapphire
 ```
 
-## 🌲 Kernel Tree
+## 🌲 Kernel (built from source)
 
 ```bash
-https://github.com/The-Angel-Place-Sapphire/device_xiaomi_sapphire-kernel
+https://github.com/The-Angel-Place-Sapphire/kernel_xiaomi_sapphire
+https://github.com/The-Angel-Place-Sapphire/kernel_xiaomi_sapphire-devicetrees
+https://github.com/The-Angel-Place-Sapphire/kernel_xiaomi_sapphire-modules
 ```
+
+The device tree builds the kernel, modules, dtb and dtbo from these sources.
+`device_xiaomi_sapphire-kernel` (prebuilt kernel) is no longer used.
 
 ## 🔒 SEPolicy
 
@@ -60,6 +65,19 @@ https://github.com/The-Angel-Place-Sapphire/android_hardware_xiaomi
 https://github.com/The-Angel-Place-Sapphire/hardware_dolby
 ```
 
+## 📷 MIUI Camera
+
+```bash
+https://github.com/The-Angel-Place-Sapphire/device_xiaomi_miuicamera-sapphire
+https://github.com/The-Angel-Place-Sapphire/vendor_xiaomi_miuicamera-sapphire
+```
+
+## 🛠️ XiaomiParts
+
+```bash
+https://github.com/The-Angel-Place-Sapphire/packages_apps_XiaomiParts
+```
+
 ---
 
 # 🚀 Download Scripts Directly Into Your ROM Source
@@ -67,20 +85,20 @@ https://github.com/The-Angel-Place-Sapphire/hardware_dolby
 Run this inside your ROM source root:
 
 ```bash
-curl -L https://raw.githubusercontent.com/The-Angel-Place-Sapphire/sapphire-bringup/main/trees.sh \
--o tools/sapphire/trees.sh
+mkdir -p tools/sapphire
 
-curl -L https://raw.githubusercontent.com/The-Angel-Place-Sapphire/sapphire-bringup/main/hals.sh \
--o tools/sapphire/hals.sh
+curl -L https://raw.githubusercontent.com/The-Angel-Place-Sapphire/place-guide/main/trees.sh -o tools/sapphire/trees.sh
 
-chmod +x trees.sh hals.sh
+curl -L https://raw.githubusercontent.com/The-Angel-Place-Sapphire/place-guide/main/hals.sh -o tools/sapphire/hals.sh
+
+chmod +x tools/sapphire/trees.sh tools/sapphire/hals.sh
 ```
 
 Run the scripts:
 
 ```bash
-bash trees.sh
-bash hals.sh
+bash tools/sapphire/trees.sh
+bash tools/sapphire/hals.sh
 ```
 
 ---
@@ -102,26 +120,40 @@ Make sure you are inside your ROM source root directory.
 # 🌳 Device Trees Script (`trees.sh`)
 
 ```bash
-# Clone Device Trees for Sapphire
+#!/bin/bash
+# Clone the device trees, kernel sources and extras for Sapphire.
+# Run from the ROM source root.
+set -e
+
+ORG=https://github.com/The-Angel-Place-Sapphire
+
+clone() { # <repo> <branch> <path>
+    echo "-> $3 ($1 @ $2)"
+    rm -rf "$3"
+    git clone --depth 1 -b "$2" "$ORG/$1.git" "$3"
+}
+
 echo "Cloning Device Trees for Sapphire..."
 
+# The kernel is built from source; the prebuilt kernel tree is no longer used
 rm -rf device/xiaomi/sapphire-kernel
-git clone --depth 1 -b lineage-23.2 https://github.com/The-Angel-Place-Sapphire/device_xiaomi_sapphire-kernel.git device/xiaomi/sapphire-kernel
 
-rm -rf device/xiaomi/sepolicy
-git clone --depth 1 -b 16 https://github.com/The-Angel-Place-Sapphire/device_xiaomi_sepolicy.git device/xiaomi/sepolicy
+# Kernel (built from source)
+clone kernel_xiaomi_sapphire              lineage-23.2 kernel/xiaomi/sapphire
+clone kernel_xiaomi_sapphire-devicetrees  lineage-23.2 kernel/xiaomi/sapphire-devicetrees
+clone kernel_xiaomi_sapphire-modules      lineage-23.2 kernel/xiaomi/sapphire-modules
 
-rm -rf device/xiaomi/sapphire
-git clone --depth 1 -b lineage-23.2 https://github.com/The-Angel-Place-Sapphire/device_xiaomi_sapphire.git device/xiaomi/sapphire
+# Device trees
+clone device_xiaomi_sepolicy              16           device/xiaomi/sepolicy
+clone device_xiaomi_sapphire              lineage-23.2 device/xiaomi/sapphire
+clone vendor_xiaomi_sapphire              lineage-23.2 vendor/xiaomi/sapphire
+clone android_hardware_xiaomi             lineage-23.2 hardware/xiaomi
 
-rm -rf vendor/xiaomi/sapphire
-git clone --depth 1 -b lineage-23.2 https://github.com/The-Angel-Place-Sapphire/vendor_xiaomi_sapphire.git vendor/xiaomi/sapphire
-
-rm -rf hardware/xiaomi
-git clone --depth 1 -b lineage-23.2 https://github.com/The-Angel-Place-Sapphire/android_hardware_xiaomi.git hardware/xiaomi
-
-rm -rf hardware/dolby
-git clone --depth 1 https://github.com/The-Angel-Place-Sapphire/hardware_dolby.git hardware/dolby
+# Used by device_xiaomi_sapphire
+clone hardware_dolby                      16           hardware/dolby
+clone packages_apps_XiaomiParts           16.2         packages/apps/XiaomiParts
+clone device_xiaomi_miuicamera-sapphire   lineage-24.0 device/xiaomi/miuicamera-sapphire
+clone vendor_xiaomi_miuicamera-sapphire   lineage-24.0 vendor/xiaomi/miuicamera-sapphire
 
 echo "============================"
 echo "Device Trees cloned successfully"
@@ -133,35 +165,32 @@ echo "============================"
 # ⚙️ HALs Script (`hals.sh`)
 
 ```bash
-# Clone HALs for SM6225
+#!/bin/bash
+# Clone the SM6225 HALs used by Sapphire.
+# Run from the ROM source root.
+set -e
+
+ORG=https://github.com/The-Angel-Place-Sapphire
+
+clone() { # <repo> <branch> <path>
+    echo "-> $3 ($1 @ $2)"
+    rm -rf "$3"
+    git clone --depth 1 -b "$2" "$ORG/$1.git" "$3"
+}
+
 echo "Cloning HALs for SM6225..."
 
-rm -rf hardware/qcom-caf/common
-git clone --depth 1 -b lineage-23.2 https://github.com/sapphire-sm6225/android_hardware_qcom-caf_common.git hardware/qcom-caf/common
+# Replaces the LineageOS one; the ROM manifest's linkfiles keep pointing here
+clone android_hardware_qcom-caf_common        lineage-23.2            hardware/qcom-caf/common
 
-rm -rf hardware/qcom-caf/sm6225/audio/agm
-git clone --depth 1 -b lineage-22.2-caf-sm6225 https://github.com/sapphire-sm6225/vendor_qcom_opensource_agm.git hardware/qcom-caf/sm6225/audio/agm
-
-rm -rf hardware/qcom-caf/sm6225/audio/pal
-git clone --depth 1 -b lineage-22.0-caf-sm6225 https://github.com/sapphire-sm6225/vendor_qcom_opensource_arpal-lx.git hardware/qcom-caf/sm6225/audio/pal
-
-rm -rf hardware/qcom-caf/sm6225/data-ipa-cfg-mgr
-git clone --depth 1 -b lineage-22.0-caf-sm6225 https://github.com/sapphire-sm6225/vendor_qcom_opensource_data-ipa-cfg-mgr.git hardware/qcom-caf/sm6225/data-ipa-cfg-mgr
-
-rm -rf hardware/qcom-caf/sm6225/dataipa
-git clone --depth 1 -b lineage-22.0-caf-sm6225 https://github.com/sapphire-sm6225/vendor_qcom_opensource_dataipa.git hardware/qcom-caf/sm6225/dataipa
-
-rm -rf hardware/qcom-caf/sm6225/display
-git clone --depth 1 -b lineage-22.0-caf-sm6225 https://github.com/sapphire-sm6225/hardware_qcom_display.git hardware/qcom-caf/sm6225/display
-
-rm -rf hardware/qcom-caf/sm6225/media
-git clone --depth 1 -b lineage-22.0-caf-sm6225 https://github.com/sapphire-sm6225/hardware_qcom_media.git hardware/qcom-caf/sm6225/media
-
-rm -rf hardware/qcom-caf/sm6225/audio/primary-hal
-git clone --depth 1 -b lineage-22.0-caf-sm6225 https://github.com/sapphire-sm6225/hardware_qcom_audio.git hardware/qcom-caf/sm6225/audio/primary-hal
-
-rm -rf device/qcom/sepolicy_vndr/sm6225
-git clone --depth 1 -b lineage-23.0-caf-sm6225 https://github.com/sapphire-sm6225/device_qcom_sepolicy_vndr.git device/qcom/sepolicy_vndr/sm6225
+clone vendor_qcom_opensource_agm              lineage-23.2-caf-sm6225 hardware/qcom-caf/sm6225/audio/agm
+clone vendor_qcom_opensource_arpal-lx         lineage-23.2-caf-sm6225 hardware/qcom-caf/sm6225/audio/pal
+clone vendor_qcom_opensource_data-ipa-cfg-mgr lineage-23.2-caf-sm6225 hardware/qcom-caf/sm6225/data-ipa-cfg-mgr
+clone vendor_qcom_opensource_dataipa          lineage-23.2-caf-sm6225 hardware/qcom-caf/sm6225/dataipa
+clone hardware_qcom_display                   lineage-22.0-caf-sm6225 hardware/qcom-caf/sm6225/display
+clone hardware_qcom_media                     lineage-23.2-caf-sm6225 hardware/qcom-caf/sm6225/media
+clone hardware_qcom_audio                     lineage-22.0-caf-sm6225 hardware/qcom-caf/sm6225/audio/primary-hal
+clone device_qcom_sepolicy_vndr               lineage-23.2-caf-sm6225 device/qcom/sepolicy_vndr/sm6225
 
 echo "============================"
 echo "HALs cloned successfully"
@@ -186,7 +215,7 @@ Benefits:
 ```bash
 mkdir -p .repo/local_manifests
 
-curl -L https://raw.githubusercontent.com/The-Angel-Place-Sapphire/sapphire-bringup/main/local_manifest.xml \
+curl -L https://raw.githubusercontent.com/The-Angel-Place-Sapphire/place-guide/main/local_manifest.xml \
 -o .repo/local_manifests/sapphire.xml
 ```
 
@@ -204,17 +233,31 @@ repo sync -j$(nproc) --force-sync
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
 
+    <remove-project name="LineageOS/android_hardware_qcom-caf_common" />  <!-- hardware/qcom-caf/common: use the sapphire one -->
     <remote
         name="theangelplace"
         fetch="https://github.com/The-Angel-Place-Sapphire" />
 
-    <!-- Device Trees -->
-
+    <!-- Kernel (built from source) -->
     <project
-        path="device/xiaomi/sapphire-kernel"
-        name="device_xiaomi_sapphire-kernel"
+        path="kernel/xiaomi/sapphire"
+        name="kernel_xiaomi_sapphire"
         remote="theangelplace"
         revision="lineage-23.2" />
+
+    <project
+        path="kernel/xiaomi/sapphire-devicetrees"
+        name="kernel_xiaomi_sapphire-devicetrees"
+        remote="theangelplace"
+        revision="lineage-23.2" />
+
+    <project
+        path="kernel/xiaomi/sapphire-modules"
+        name="kernel_xiaomi_sapphire-modules"
+        remote="theangelplace"
+        revision="lineage-23.2" />
+
+    <!-- Device Trees -->
 
     <project
         path="device/xiaomi/sepolicy"
@@ -240,43 +283,52 @@ repo sync -j$(nproc) --force-sync
         remote="theangelplace"
         revision="lineage-23.2" />
 
-    <project
-        path="hardware/dolby"
-        name="hardware_dolby"
-        remote="theangelplace"
-        revision="lineage-23.2" />
-
     <!-- HALs -->
 
     <project
         path="hardware/qcom-caf/common"
         name="android_hardware_qcom-caf_common"
         remote="theangelplace"
-        revision="lineage-23.2" />
+        revision="lineage-23.2">
+        <linkfile src="os_pickup_aosp.mk" dest="hardware/qcom/Android.mk" />
+        <linkfile src="os_pickup_sepolicy_vndr.mk" dest="device/qcom/sepolicy_vndr/SEPolicy.mk" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/msm8953/Android.bp" />
+        <linkfile src="os_pickup.bp" dest="hardware/qcom-caf/msm8998/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sdm660/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sdm845/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8150/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8250/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8350/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8450/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8450-6.6/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8550/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8650/Android.bp" />
+        <linkfile src="os_pickup_qssi.bp" dest="hardware/qcom-caf/sm8750/Android.bp" />
+    </project>
 
     <project
         path="hardware/qcom-caf/sm6225/audio/agm"
         name="vendor_qcom_opensource_agm"
         remote="theangelplace"
-        revision="lineage-22.2-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/audio/pal"
         name="vendor_qcom_opensource_arpal-lx"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/data-ipa-cfg-mgr"
         name="vendor_qcom_opensource_data-ipa-cfg-mgr"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/dataipa"
         name="vendor_qcom_opensource_dataipa"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/display"
@@ -288,7 +340,7 @@ repo sync -j$(nproc) --force-sync
         path="hardware/qcom-caf/sm6225/media"
         name="hardware_qcom_media"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/audio/primary-hal"
@@ -300,7 +352,32 @@ repo sync -j$(nproc) --force-sync
         path="device/qcom/sepolicy_vndr/sm6225"
         name="device_qcom_sepolicy_vndr"
         remote="theangelplace"
-        revision="lineage-23.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
+
+    <!-- Used by device_xiaomi_sapphire -->
+    <project
+        path="hardware/dolby"
+        name="hardware_dolby"
+        remote="theangelplace"
+        revision="16" />
+
+    <project
+        path="packages/apps/XiaomiParts"
+        name="packages_apps_XiaomiParts"
+        remote="theangelplace"
+        revision="16.2" />
+
+    <project
+        path="device/xiaomi/miuicamera-sapphire"
+        name="device_xiaomi_miuicamera-sapphire"
+        remote="theangelplace"
+        revision="lineage-24.0" />
+
+    <project
+        path="vendor/xiaomi/miuicamera-sapphire"
+        name="vendor_xiaomi_miuicamera-sapphire"
+        remote="theangelplace"
+        revision="lineage-24.0" />
 
 </manifest>
 ```

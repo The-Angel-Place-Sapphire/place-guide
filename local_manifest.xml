@@ -78,25 +78,25 @@
         path="hardware/qcom-caf/sm6225/audio/agm"
         name="vendor_qcom_opensource_agm"
         remote="theangelplace"
-        revision="lineage-22.2-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/audio/pal"
         name="vendor_qcom_opensource_arpal-lx"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/data-ipa-cfg-mgr"
         name="vendor_qcom_opensource_data-ipa-cfg-mgr"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/dataipa"
         name="vendor_qcom_opensource_dataipa"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/display"
@@ -108,7 +108,7 @@
         path="hardware/qcom-caf/sm6225/media"
         name="hardware_qcom_media"
         remote="theangelplace"
-        revision="lineage-22.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <project
         path="hardware/qcom-caf/sm6225/audio/primary-hal"
@@ -120,7 +120,7 @@
         path="device/qcom/sepolicy_vndr/sm6225"
         name="device_qcom_sepolicy_vndr"
         remote="theangelplace"
-        revision="lineage-23.0-caf-sm6225" />
+        revision="lineage-23.2-caf-sm6225" />
 
     <!-- Used by device_xiaomi_sapphire -->
     <project
@@ -139,12 +139,12 @@
         path="device/xiaomi/miuicamera-sapphire"
         name="device_xiaomi_miuicamera-sapphire"
         remote="theangelplace"
-        revision="bka" />
+        revision="lineage-24.0" />
 
     <project
         path="vendor/xiaomi/miuicamera-sapphire"
         name="vendor_xiaomi_miuicamera-sapphire"
         remote="theangelplace"
-        revision="sapphire" />
+        revision="lineage-24.0" />
 
 </manifest>
